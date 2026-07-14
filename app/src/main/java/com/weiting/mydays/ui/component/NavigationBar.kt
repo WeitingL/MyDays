@@ -139,7 +139,7 @@ private fun GlassNavItem(
     }
 }
 
-private val previewNavItems = listOf(
+internal val previewNavItems = listOf(
     NavBarItem(Icons.Default.Home, "Home"),
     NavBarItem(Icons.Default.Search, "Search"),
     NavBarItem(Icons.Default.Favorite, "Favorite"),

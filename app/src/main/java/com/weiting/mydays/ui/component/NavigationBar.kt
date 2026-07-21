@@ -134,7 +134,7 @@ private fun GlassNavItem(
         Icon(
             imageVector = item.icon,
             contentDescription = item.label,
-            tint = if (selected) Color.White else Color.White.copy(alpha = 0.55f)
+            tint = if (selected) Color.Black else Color.Black.copy(alpha = 0.55f)
         )
     }
 }

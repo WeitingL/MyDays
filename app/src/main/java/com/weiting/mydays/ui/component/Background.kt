@@ -37,23 +37,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 enum class NavBarBackground(val label: String, val colors: List<Color>) {
-    Sunset(label = "Sunset", colors = listOf(Color(0xFF6D5BFF), Color(0xFFFF6FA8), Color(0xFFFFC371))),
-    Ocean(label = "Ocean", colors = listOf(Color(0xFF0F2027), Color(0xFF2C5364), Color(0xFF00C9A7))),
-    Midnight(label = "Midnight", colors = listOf(Color(0xFF0F0C29), Color(0xFF302B63), Color(0xFF24243E))),
-    Aurora(label = "Aurora", colors = listOf(Color(0xFF00C9FF), Color(0xFF4DE8C4), Color(0xFF92FE9D)));
+    Sunrise(label = "Sunrise", colors = listOf(Color(0xFFFFE5EC), Color(0xFFFFD6E8), Color(0xFFFFF0C2))),
+    Sky(label = "Sky", colors = listOf(Color(0xFFE0F7FA), Color(0xFFB3E5FC), Color(0xFF81D4FA))),
+    Mint(label = "Mint", colors = listOf(Color(0xFFE8F9F0), Color(0xFFC8F4DE), Color(0xFFA0E9C8))),
+    Lavender(label = "Lavender", colors = listOf(Color(0xFFF1E9FF), Color(0xFFDCC9FF), Color(0xFFC2A8FF)));
 
     val brush: Brush get() = Brush.linearGradient(colors)
 }
+
+private val LightBackgroundContentColor = Color(0xFF2E2A45)
 
 @Composable
 private fun BackgroundLabel(label: String, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(50))
-            .background(Color.Black.copy(alpha = 0.25f))
+            .background(Color.White.copy(alpha = 0.55f))
             .padding(horizontal = 16.dp, vertical = 6.dp)
     ) {
-        Text(text = label, color = Color.White)
+        Text(text = label, color = LightBackgroundContentColor)
     }
 }
 
@@ -72,12 +74,12 @@ private fun NavPageContent(index: Int, modifier: Modifier = Modifier) {
         Icon(
             imageVector = item.icon,
             contentDescription = item.label,
-            tint = Color.White,
+            tint = LightBackgroundContentColor,
             modifier = Modifier.size(72.dp)
         )
         Text(
             text = item.label,
-            color = Color.White,
+            color = LightBackgroundContentColor,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 12.dp)

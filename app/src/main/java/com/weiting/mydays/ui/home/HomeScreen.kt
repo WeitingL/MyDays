@@ -13,6 +13,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = "Home Page")
+        Text(text = "首頁")
     }
 }

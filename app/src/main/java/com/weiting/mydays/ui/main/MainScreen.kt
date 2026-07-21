@@ -12,10 +12,13 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.weiting.mydays.ui.component.MainScaffold
 import com.weiting.mydays.ui.component.NavBarBackground
 import com.weiting.mydays.ui.component.NavBarItem
-import com.weiting.mydays.ui.features.FeaturesScreen
+import com.weiting.mydays.ui.features.FeaturesNavHost
+import com.weiting.mydays.ui.features.ROUTE_FEATURES_TODO
 import com.weiting.mydays.ui.home.HomeScreen
 import com.weiting.mydays.ui.profile.ProfileScreen
 import com.weiting.mydays.ui.records.RecordsScreen
@@ -34,24 +37,30 @@ private val tabBackgrounds = listOf(
     NavBarBackground.Lavender
 )
 
+private const val FEATURES_TAB_INDEX = 2
+
 @Composable
 fun MainScreen(
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedIndex by remember { mutableIntStateOf(0) }
+    val featuresNavController = rememberNavController()
+    val featuresBackStackEntry by featuresNavController.currentBackStackEntryAsState()
+    val isFeaturesSubPage = featuresBackStackEntry?.destination?.route == ROUTE_FEATURES_TODO
 
     MainScaffold(
         items = tabItems,
         backgrounds = tabBackgrounds,
         selectedIndex = selectedIndex,
         onItemSelected = { selectedIndex = it },
+        showNavBar = !isFeaturesSubPage,
         modifier = modifier.fillMaxSize()
     ) { index ->
         when (index) {
             0 -> HomeScreen()
             1 -> RecordsScreen()
-            2 -> FeaturesScreen()
+            FEATURES_TAB_INDEX -> FeaturesNavHost(navController = featuresNavController)
             else -> ProfileScreen(onLogout = onLogout)
         }
     }

@@ -35,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -63,7 +62,6 @@ fun LiquidGlassNavBarSliding(
     BoxWithConstraints(
         modifier = modifier
             .height(64.dp)
-            .shadow(elevation = 16.dp, shape = RoundedCornerShape(50))
             .clip(RoundedCornerShape(50))
             .background(
                 Brush.linearGradient(

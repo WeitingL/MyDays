@@ -1,6 +1,7 @@
 package com.weiting.mydays.ui.component
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.tween
@@ -32,6 +33,7 @@ fun MainScaffold(
     selectedIndex: Int,
     onItemSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    showNavBar: Boolean = true,
     content: @Composable (Int) -> Unit
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -53,15 +55,22 @@ fun MainScaffold(
             }
         }
 
-        LiquidGlassNavBarSliding(
-            items = items,
-            selectedIndex = selectedIndex,
-            onItemSelected = onItemSelected,
+        AnimatedVisibility(
+            visible = showNavBar,
+            enter = fadeIn(tween(300)),
+            exit = fadeOut(tween(300)),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .navigationBarsPadding()
                 .padding(horizontal = 24.dp, vertical = 24.dp)
-        )
+        ) {
+            LiquidGlassNavBarSliding(
+                items = items,
+                selectedIndex = selectedIndex,
+                onItemSelected = onItemSelected,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }

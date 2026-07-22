@@ -13,3 +13,6 @@ local.properties
 *.jks
 *.keystore
 key.properties
+
+# Claude local settings
+.claude/settings.local.json

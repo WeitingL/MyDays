@@ -12,7 +12,7 @@
 | UI | Jetpack Compose + Material3 |
 | Auth | Firebase Authentication（Google Sign-In） |
 | Navigation | Compose Navigation |
-| DI | 無（目前直接 `viewModel()` 取得） |
+| DI | Koin（Auth 與 Habit 已遷移） |
 
 ## Architecture
 

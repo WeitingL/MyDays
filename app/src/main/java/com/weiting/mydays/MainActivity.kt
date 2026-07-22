@@ -10,7 +10,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -18,6 +17,7 @@ import com.weiting.mydays.ui.auth.AuthViewModel
 import com.weiting.mydays.ui.auth.LoginScreen
 import com.weiting.mydays.ui.main.MainScreen
 import com.weiting.mydays.ui.theme.MyDaysTheme
+import org.koin.androidx.compose.koinViewModel
 
 private const val ROUTE_LOGIN = "login"
 private const val ROUTE_MAIN = "main"
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun MyDaysNavHost(
     modifier: Modifier = Modifier,
-    authViewModel: AuthViewModel = viewModel()
+    authViewModel: AuthViewModel = koinViewModel()
 ) {
     val navController = rememberNavController()
     val currentUser by authViewModel.currentUser.collectAsState()

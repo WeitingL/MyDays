@@ -5,10 +5,12 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.weiting.mydays.ui.habit.HabitScreen
 import com.weiting.mydays.ui.todo.TodoScreen
 
 private const val ROUTE_FEATURES_LIST = "features_list"
 internal const val ROUTE_FEATURES_TODO = "features_todo"
+internal const val ROUTE_FEATURES_HABIT = "features_habit"
 
 /** Sub-navigation graph for the 功能 tab: the feature grid, drilling into each module. */
 @Composable
@@ -22,10 +24,16 @@ fun FeaturesNavHost(
         modifier = modifier
     ) {
         composable(ROUTE_FEATURES_LIST) {
-            FeaturesScreen(onOpenTodo = { navController.navigate(ROUTE_FEATURES_TODO) })
+            FeaturesScreen(
+                onOpenTodo = { navController.navigate(ROUTE_FEATURES_TODO) },
+                onOpenHabit = { navController.navigate(ROUTE_FEATURES_HABIT) }
+            )
         }
         composable(ROUTE_FEATURES_TODO) {
             TodoScreen(onBack = { navController.popBackStack() })
+        }
+        composable(ROUTE_FEATURES_HABIT) {
+            HabitScreen(onBack = { navController.popBackStack() })
         }
     }
 }

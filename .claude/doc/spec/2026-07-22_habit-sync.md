@@ -83,4 +83,4 @@
 
 > 實作注意事項、已知限制。
 
-- 需先確認專案是否引入 Firestore 依賴（目前僅有 Firebase Auth）。
+- Firestore 已導入並套用（`app/build.gradle.kts`）；本 spec 直接沿用。

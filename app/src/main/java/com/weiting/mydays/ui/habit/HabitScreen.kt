@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Icon
@@ -17,10 +18,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.weiting.mydays.data.habit.Habit
 import com.weiting.mydays.data.habit.HabitType
+import com.weiting.mydays.data.habit.HabitWithStreak
 import com.weiting.mydays.ui.component.GlassChoiceChip
 import com.weiting.mydays.ui.component.GlassDialog
 import com.weiting.mydays.ui.component.GlassTextField
@@ -35,6 +38,11 @@ import org.koin.androidx.compose.koinViewModel
 private fun HabitType.label(): String = when (this) {
     HabitType.BUILD -> "養成好習慣"
     HabitType.QUIT -> "戒除壞習慣"
+}
+
+private fun HabitWithStreak.subtitle(): String = when (habit.type) {
+    HabitType.BUILD -> "${habit.type.label()} · 連續 $streak 天"
+    HabitType.QUIT -> "${habit.type.label()} · 已 $streak 天未破戒"
 }
 
 @Composable
@@ -59,19 +67,42 @@ fun HabitScreen(
             Spacer(modifier = Modifier.height(20.dp))
             SettingSectionHeader("我的習慣")
             SettingGroup {
-                habits.forEachIndexed { index, habit ->
+                habits.forEachIndexed { index, item ->
+                    val habit = item.habit
                     SettingItem(
                         icon = if (habit.type == HabitType.BUILD) Icons.Default.TrendingUp else Icons.Default.Block,
                         title = habit.name,
-                        subtitle = habit.type.label(),
+                        subtitle = item.subtitle(),
                         onClick = { editorTarget = HabitEditorState(habit) },
                         trailing = {
-                            IconButton(onClick = { viewModel.deleteHabit(habit.id) }) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "刪除",
-                                    tint = SettingContentColor.copy(alpha = 0.5f)
-                                )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                when (habit.type) {
+                                    HabitType.BUILD -> IconButton(
+                                        onClick = { viewModel.toggleTodayCheckIn(habit.id, item.completedToday) }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.CheckCircle,
+                                            contentDescription = "今日打卡",
+                                            tint = if (item.completedToday) SettingContentColor
+                                            else SettingContentColor.copy(alpha = 0.25f)
+                                        )
+                                    }
+                                    HabitType.QUIT -> GlassChoiceChip(
+                                        text = "破戒",
+                                        selected = false,
+                                        onClick = { viewModel.recordRelapse(habit.id) }
+                                    )
+                                }
+                                IconButton(onClick = { viewModel.deleteHabit(habit.id) }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "刪除",
+                                        tint = SettingContentColor.copy(alpha = 0.5f)
+                                    )
+                                }
                             }
                         }
                     )

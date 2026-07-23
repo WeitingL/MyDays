@@ -18,11 +18,12 @@ val appModule = module {
             androidContext(),
             MyDaysDatabase::class.java,
             "mydays.db"
-        ).build()
+        ).fallbackToDestructiveMigration(dropAllTables = true).build()
     }
     single { get<MyDaysDatabase>().habitDao() }
+    single { get<MyDaysDatabase>().checkInDao() }
     single<AuthRepository> { AuthRepositoryImpl() }
-    single<HabitRepository> { HabitRepositoryImpl(get()) }
+    single<HabitRepository> { HabitRepositoryImpl(get(), get()) }
     viewModel { AuthViewModel(get()) }
     viewModel { HabitViewModel(get()) }
 }

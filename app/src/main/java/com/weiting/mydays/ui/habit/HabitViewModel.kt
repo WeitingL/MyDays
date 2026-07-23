@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.weiting.mydays.data.habit.Habit
 import com.weiting.mydays.data.habit.HabitRepository
 import com.weiting.mydays.data.habit.HabitType
+import com.weiting.mydays.data.habit.HabitWithStreak
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -14,7 +15,7 @@ class HabitViewModel(
     private val repository: HabitRepository
 ) : ViewModel() {
 
-    val habits: StateFlow<List<Habit>> = repository.observeAll()
+    val habits: StateFlow<List<HabitWithStreak>> = repository.observeHabitsWithStreak()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     fun addHabit(name: String, type: HabitType) {
@@ -27,5 +28,16 @@ class HabitViewModel(
 
     fun deleteHabit(id: String) {
         viewModelScope.launch { repository.delete(id) }
+    }
+
+    fun toggleTodayCheckIn(habitId: String, completedToday: Boolean) {
+        viewModelScope.launch {
+            if (completedToday) repository.undoTodayCheckIn(habitId)
+            else repository.checkInToday(habitId)
+        }
+    }
+
+    fun recordRelapse(habitId: String) {
+        viewModelScope.launch { repository.recordRelapse(habitId) }
     }
 }

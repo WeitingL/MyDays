@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface HabitRepository {
     fun observeHabitsWithStreak(): Flow<List<HabitWithStreak>>
-    suspend fun add(name: String, type: HabitType)
+    suspend fun add(name: String, type: HabitType, reminderMinuteOfDay: Int?)
     suspend fun update(habit: Habit)
     suspend fun delete(id: String)
     suspend fun checkInToday(habitId: String)

@@ -13,6 +13,7 @@ data class HabitEntity(
     val type: HabitType,
     val createdAt: Long,
     val updatedAt: Long,
+    val reminderMinuteOfDay: Int? = null,
     val deletedAt: Long? = null,
     val pendingSync: Boolean = false
 )

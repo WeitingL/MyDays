@@ -29,6 +29,10 @@ interface HabitDao {
     @Query("SELECT * FROM habits WHERE deletedAt IS NULL ORDER BY createdAt DESC")
     fun observeAll(): Flow<List<HabitEntity>>
 
+    // 重排用：active 且有設提醒
+    @Query("SELECT * FROM habits WHERE deletedAt IS NULL AND reminderMinuteOfDay IS NOT NULL")
+    suspend fun getActiveWithReminder(): List<HabitEntity>
+
     // 同步用：撈待上傳 / 清旗標
     @Query("SELECT * FROM habits WHERE pendingSync = 1")
     suspend fun getPending(): List<HabitEntity>

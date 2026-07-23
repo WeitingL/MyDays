@@ -1,8 +1,13 @@
 package com.weiting.mydays.ui.habit
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -10,8 +15,13 @@ import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TimeInput
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -20,7 +30,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.weiting.mydays.data.habit.Habit
 import com.weiting.mydays.data.habit.HabitType
 import com.weiting.mydays.data.habit.HabitWithStreak
@@ -118,12 +130,14 @@ fun HabitScreen(
         HabitEditorDialog(
             state = state,
             onDismiss = { editorTarget = null },
-            onConfirm = { name, type ->
+            onConfirm = { name, type, reminderMinuteOfDay ->
                 val existing = state.habit
                 if (existing == null) {
-                    viewModel.addHabit(name, type)
+                    viewModel.addHabit(name, type, reminderMinuteOfDay)
                 } else {
-                    viewModel.updateHabit(existing.copy(name = name, type = type))
+                    viewModel.updateHabit(
+                        existing.copy(name = name, type = type, reminderMinuteOfDay = reminderMinuteOfDay)
+                    )
                 }
                 editorTarget = null
             }
@@ -133,20 +147,37 @@ fun HabitScreen(
 
 private data class HabitEditorState(val habit: Habit? = null)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HabitEditorDialog(
     state: HabitEditorState,
     onDismiss: () -> Unit,
-    onConfirm: (name: String, type: HabitType) -> Unit
+    onConfirm: (name: String, type: HabitType, reminderMinuteOfDay: Int?) -> Unit
 ) {
+    val context = LocalContext.current
     var name by remember { mutableStateOf(state.habit?.name.orEmpty()) }
     var type by remember { mutableStateOf(state.habit?.type ?: HabitType.BUILD) }
+    var reminderEnabled by remember { mutableStateOf(state.habit?.reminderMinuteOfDay != null) }
+
+    val initialMinute = state.habit?.reminderMinuteOfDay ?: DEFAULT_REMINDER_MINUTE
+    val timeState = rememberTimePickerState(
+        initialHour = initialMinute / 60,
+        initialMinute = initialMinute % 60,
+        is24Hour = true
+    )
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted -> reminderEnabled = granted }
 
     GlassDialog(
         onDismiss = onDismiss,
         title = if (state.habit == null) "新增習慣" else "編輯習慣",
         confirmEnabled = name.isNotBlank(),
-        onConfirm = { onConfirm(name, type) }
+        onConfirm = {
+            val minute = if (reminderEnabled) timeState.hour * 60 + timeState.minute else null
+            onConfirm(name, type, minute)
+        }
     ) {
         GlassTextField(
             value = name,
@@ -163,5 +194,33 @@ private fun HabitEditorDialog(
                 )
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "每日提醒", color = SettingContentColor)
+            Switch(
+                checked = reminderEnabled,
+                onCheckedChange = { checked ->
+                    if (!checked) {
+                        reminderEnabled = false
+                    } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
+                        PackageManager.PERMISSION_GRANTED
+                    ) {
+                        reminderEnabled = true
+                    } else {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+            )
+        }
+        if (reminderEnabled) {
+            Spacer(modifier = Modifier.height(8.dp))
+            TimeInput(state = timeState)
+        }
     }
 }
+
+private const val DEFAULT_REMINDER_MINUTE = 9 * 60

@@ -1,5 +1,6 @@
 package com.weiting.mydays.data.habit
 
+import com.weiting.mydays.notification.HabitReminderScheduler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import java.util.UUID
@@ -7,7 +8,8 @@ import java.util.UUID
 class HabitRepositoryImpl(
     private val dao: HabitDao,
     private val checkInDao: CheckInDao,
-    private val syncManager: HabitSyncManager
+    private val syncManager: HabitSyncManager,
+    private val reminderScheduler: HabitReminderScheduler
 ) : HabitRepository {
 
     override fun observeHabitsWithStreak(): Flow<List<HabitWithStreak>> =
@@ -35,31 +37,40 @@ class HabitRepositoryImpl(
             }
         }
 
-    override suspend fun add(name: String, type: HabitType) {
+    override suspend fun add(name: String, type: HabitType, reminderMinuteOfDay: Int?) {
         val now = System.currentTimeMillis()
+        val id = UUID.randomUUID().toString()
         dao.insert(
             HabitEntity(
-                id = UUID.randomUUID().toString(),
+                id = id,
                 name = name,
                 type = type,
                 createdAt = now,
                 updatedAt = now,
+                reminderMinuteOfDay = reminderMinuteOfDay,
                 pendingSync = true
             )
         )
+        applyReminder(id, name, reminderMinuteOfDay)
         syncManager.schedulePush()
     }
 
     override suspend fun update(habit: Habit) {
-        dao.update(
-            habit.copy(updatedAt = System.currentTimeMillis()).toEntity().copy(pendingSync = true)
-        )
+        val updated = habit.copy(updatedAt = System.currentTimeMillis())
+        dao.update(updated.toEntity().copy(pendingSync = true))
+        applyReminder(updated.id, updated.name, updated.reminderMinuteOfDay)
         syncManager.schedulePush()
     }
 
     override suspend fun delete(id: String) {
         dao.softDelete(id, System.currentTimeMillis())
+        reminderScheduler.cancel(id)
         syncManager.schedulePush()
+    }
+
+    private fun applyReminder(habitId: String, name: String, minuteOfDay: Int?) {
+        if (minuteOfDay != null) reminderScheduler.schedule(habitId, name, minuteOfDay)
+        else reminderScheduler.cancel(habitId)
     }
 
     override suspend fun checkInToday(habitId: String) {

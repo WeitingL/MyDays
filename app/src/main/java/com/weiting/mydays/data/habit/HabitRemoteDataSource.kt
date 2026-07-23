@@ -40,6 +40,7 @@ private fun HabitEntity.toMap(): Map<String, Any?> = mapOf(
     "type" to type.name,
     "createdAt" to createdAt,
     "updatedAt" to updatedAt,
+    "reminderMinuteOfDay" to reminderMinuteOfDay,
     "deletedAt" to deletedAt
 )
 
@@ -58,6 +59,7 @@ private fun DocumentSnapshot.toHabitEntity(): HabitEntity = HabitEntity(
     type = HabitType.valueOf(getString("type")!!),
     createdAt = getLong("createdAt")!!,
     updatedAt = getLong("updatedAt")!!,
+    reminderMinuteOfDay = getLong("reminderMinuteOfDay")?.toInt(),
     deletedAt = getLong("deletedAt"),
     pendingSync = false
 )

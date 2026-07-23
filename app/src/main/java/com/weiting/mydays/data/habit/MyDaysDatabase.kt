@@ -8,7 +8,7 @@ import com.weiting.mydays.data.sync.SyncMetaEntity
 
 @Database(
     entities = [HabitEntity::class, CheckInEntity::class, SyncMetaEntity::class],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(HabitConverters::class)

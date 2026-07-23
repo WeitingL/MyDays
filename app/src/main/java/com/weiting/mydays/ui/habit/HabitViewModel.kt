@@ -18,8 +18,8 @@ class HabitViewModel(
     val habits: StateFlow<List<HabitWithStreak>> = repository.observeHabitsWithStreak()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    fun addHabit(name: String, type: HabitType) {
-        viewModelScope.launch { repository.add(name, type) }
+    fun addHabit(name: String, type: HabitType, reminderMinuteOfDay: Int?) {
+        viewModelScope.launch { repository.add(name, type, reminderMinuteOfDay) }
     }
 
     fun updateHabit(habit: Habit) {

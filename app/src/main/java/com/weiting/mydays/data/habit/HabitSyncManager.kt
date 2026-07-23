@@ -3,6 +3,7 @@ package com.weiting.mydays.data.habit
 import com.weiting.mydays.data.auth.AuthRepository
 import com.weiting.mydays.data.sync.SyncMetaDao
 import com.weiting.mydays.data.sync.SyncMetaEntity
+import com.weiting.mydays.notification.HabitReminderScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -12,6 +13,7 @@ class HabitSyncManager(
     private val checkInDao: CheckInDao,
     private val syncMetaDao: SyncMetaDao,
     private val authRepository: AuthRepository,
+    private val reminderScheduler: HabitReminderScheduler,
     private val scope: CoroutineScope
 ) {
     /** 本地寫入後即時觸發（fire-and-forget）；離線失敗則旗標留給 Worker 補傳。 */
@@ -27,6 +29,10 @@ class HabitSyncManager(
     suspend fun sync() {
         pushPending()
         pull()
+        // pull 後（可能含跨裝置同步來的提醒設定）在本機重排 alarm
+        habitDao.getActiveWithReminder().forEach { habit ->
+            habit.reminderMinuteOfDay?.let { reminderScheduler.schedule(habit.id, habit.name, it) }
+        }
     }
 
     suspend fun pushPending() {

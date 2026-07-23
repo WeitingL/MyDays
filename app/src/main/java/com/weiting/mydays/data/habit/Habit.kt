@@ -6,6 +6,7 @@ data class Habit(
     val type: HabitType,
     val createdAt: Long,
     val updatedAt: Long,
+    val reminderMinuteOfDay: Int? = null,
     val deletedAt: Long? = null
 )
 
@@ -15,6 +16,7 @@ fun HabitEntity.toDomain(): Habit = Habit(
     type = type,
     createdAt = createdAt,
     updatedAt = updatedAt,
+    reminderMinuteOfDay = reminderMinuteOfDay,
     deletedAt = deletedAt
 )
 
@@ -24,5 +26,6 @@ fun Habit.toEntity(): HabitEntity = HabitEntity(
     type = type,
     createdAt = createdAt,
     updatedAt = updatedAt,
+    reminderMinuteOfDay = reminderMinuteOfDay,
     deletedAt = deletedAt
 )

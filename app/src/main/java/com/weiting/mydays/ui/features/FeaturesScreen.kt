@@ -22,16 +22,15 @@ import com.weiting.mydays.ui.component.SettingSectionHeader
 @Composable
 fun FeaturesScreen(
     modifier: Modifier = Modifier,
-    onOpenTodo: () -> Unit = {},
     onOpenHabit: () -> Unit = {}
 ) {
-    val featureEntries = remember(onOpenTodo, onOpenHabit) {
+    val featureEntries = remember(onOpenHabit) {
         listOf(
-            FeatureEntry(icon = Icons.Default.CheckCircle, title = "待辦事項", enabled = true, onClick = onOpenTodo),
+            FeatureEntry(icon = Icons.Default.Loop, title = "習慣養成", enabled = true, onClick = onOpenHabit),
+            FeatureEntry(icon = Icons.Default.CheckCircle, title = "待辦事項", enabled = false),
             FeatureEntry(icon = Icons.Default.FitnessCenter, title = "運動管理", enabled = false),
             FeatureEntry(icon = Icons.Default.Restaurant, title = "飲食", enabled = false),
-            FeatureEntry(icon = Icons.Default.Savings, title = "記帳", enabled = false),
-            FeatureEntry(icon = Icons.Default.Loop, title = "習慣養成", enabled = true, onClick = onOpenHabit)
+            FeatureEntry(icon = Icons.Default.Savings, title = "記帳", enabled = false)
         )
     }
 

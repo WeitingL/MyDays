@@ -18,7 +18,7 @@ import com.weiting.mydays.ui.component.MainScaffold
 import com.weiting.mydays.ui.component.NavBarBackground
 import com.weiting.mydays.ui.component.NavBarItem
 import com.weiting.mydays.ui.features.FeaturesNavHost
-import com.weiting.mydays.ui.features.ROUTE_FEATURES_TODO
+import com.weiting.mydays.ui.features.ROUTE_FEATURES_HABIT
 import com.weiting.mydays.ui.home.HomeScreen
 import com.weiting.mydays.ui.profile.ProfileScreen
 import com.weiting.mydays.ui.records.RecordsScreen
@@ -47,7 +47,7 @@ fun MainScreen(
     var selectedIndex by remember { mutableIntStateOf(0) }
     val featuresNavController = rememberNavController()
     val featuresBackStackEntry by featuresNavController.currentBackStackEntryAsState()
-    val isFeaturesSubPage = featuresBackStackEntry?.destination?.route == ROUTE_FEATURES_TODO
+    val isFeaturesSubPage = featuresBackStackEntry?.destination?.route == ROUTE_FEATURES_HABIT
 
     MainScaffold(
         items = tabItems,

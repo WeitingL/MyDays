@@ -1,7 +1,6 @@
 package com.weiting.mydays.ui.habit
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -10,13 +9,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,6 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.weiting.mydays.data.habit.Habit
 import com.weiting.mydays.data.habit.HabitType
+import com.weiting.mydays.ui.component.GlassChoiceChip
+import com.weiting.mydays.ui.component.GlassDialog
+import com.weiting.mydays.ui.component.GlassTextField
 import com.weiting.mydays.ui.component.SettingContentColor
 import com.weiting.mydays.ui.component.SettingDivider
 import com.weiting.mydays.ui.component.SettingGroup
@@ -114,39 +111,26 @@ private fun HabitEditorDialog(
     var name by remember { mutableStateOf(state.habit?.name.orEmpty()) }
     var type by remember { mutableStateOf(state.habit?.type ?: HabitType.BUILD) }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(if (state.habit == null) "新增習慣" else "編輯習慣") },
-        text = {
-            Column {
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text("習慣名稱") },
-                    singleLine = true
+    GlassDialog(
+        onDismiss = onDismiss,
+        title = if (state.habit == null) "新增習慣" else "編輯習慣",
+        confirmEnabled = name.isNotBlank(),
+        onConfirm = { onConfirm(name, type) }
+    ) {
+        GlassTextField(
+            value = name,
+            onValueChange = { name = it },
+            placeholder = "習慣名稱"
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            HabitType.entries.forEach { option ->
+                GlassChoiceChip(
+                    text = option.label(),
+                    selected = type == option,
+                    onClick = { type = option }
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    HabitType.entries.forEach { option ->
-                        FilterChip(
-                            selected = type == option,
-                            onClick = { type = option },
-                            label = { Text(option.label()) }
-                        )
-                    }
-                }
             }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onConfirm(name, type) },
-                enabled = name.isNotBlank()
-            ) {
-                Text("儲存")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("取消") }
         }
-    )
+    }
 }

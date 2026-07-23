@@ -12,7 +12,9 @@ data class HabitEntity(
     val name: String,
     val type: HabitType,
     val createdAt: Long,
-    val updatedAt: Long
+    val updatedAt: Long,
+    val deletedAt: Long? = null,
+    val pendingSync: Boolean = false
 )
 
 class HabitConverters {

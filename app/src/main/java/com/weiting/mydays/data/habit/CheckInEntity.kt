@@ -21,5 +21,8 @@ data class CheckInEntity(
     @PrimaryKey val id: String,
     val habitId: String,
     val epochDay: Long,
-    val createdAt: Long
+    val createdAt: Long,
+    val updatedAt: Long,
+    val deletedAt: Long? = null,
+    val pendingSync: Boolean = false
 )

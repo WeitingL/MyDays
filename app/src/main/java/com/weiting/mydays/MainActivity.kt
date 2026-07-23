@@ -13,11 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.weiting.mydays.data.habit.HabitSyncManager
 import com.weiting.mydays.ui.auth.AuthViewModel
 import com.weiting.mydays.ui.auth.LoginScreen
 import com.weiting.mydays.ui.main.MainScreen
 import com.weiting.mydays.ui.theme.MyDaysTheme
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 private const val ROUTE_LOGIN = "login"
 private const val ROUTE_MAIN = "main"
@@ -37,7 +39,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun MyDaysNavHost(
     modifier: Modifier = Modifier,
-    authViewModel: AuthViewModel = koinViewModel()
+    authViewModel: AuthViewModel = koinViewModel(),
+    syncManager: HabitSyncManager = koinInject()
 ) {
     val navController = rememberNavController()
     val currentUser by authViewModel.currentUser.collectAsState()
@@ -50,6 +53,7 @@ private fun MyDaysNavHost(
             }
             launchSingleTop = true
         }
+        if (currentUser != null) syncManager.scheduleSync()
     }
 
     NavHost(

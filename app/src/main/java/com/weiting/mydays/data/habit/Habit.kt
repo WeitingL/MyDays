@@ -5,7 +5,8 @@ data class Habit(
     val name: String,
     val type: HabitType,
     val createdAt: Long,
-    val updatedAt: Long
+    val updatedAt: Long,
+    val deletedAt: Long? = null
 )
 
 fun HabitEntity.toDomain(): Habit = Habit(
@@ -13,7 +14,8 @@ fun HabitEntity.toDomain(): Habit = Habit(
     name = name,
     type = type,
     createdAt = createdAt,
-    updatedAt = updatedAt
+    updatedAt = updatedAt,
+    deletedAt = deletedAt
 )
 
 fun Habit.toEntity(): HabitEntity = HabitEntity(
@@ -21,5 +23,6 @@ fun Habit.toEntity(): HabitEntity = HabitEntity(
     name = name,
     type = type,
     createdAt = createdAt,
-    updatedAt = updatedAt
+    updatedAt = updatedAt,
+    deletedAt = deletedAt
 )

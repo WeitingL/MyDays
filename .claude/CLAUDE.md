@@ -23,10 +23,12 @@
 
 ## 討論記錄
 
-文件依用途分兩層存放：
+文件依用途分四層存放：
 
-| 目錄 | 用途 | 觸發方式 |
+| 路徑 | 用途 | 觸發方式 |
 |---|---|---|
+| `.claude/doc/CONVENTIONS.md` | 跨 spec 的長期通則，所有 spec 與 agent 都受約束 | agent 提議、我批准 |
+| `.claude/doc/LOOP_LOG.md` | 跨 spec 的 loop 病歷：各角色的行為模式與 orchestrator 對策 | 每輪 loop 收尾時由 orchestrator 更新 |
 | `.claude/doc/feature/` | 功能方向規劃：問題定義、User Stories、設計準備、開發階段拆解 | `/feature` skill |
 | `.claude/doc/spec/` | 子功能實作規格：需求細節、功能設計、coding 範圍 | `/spec` skill |
 

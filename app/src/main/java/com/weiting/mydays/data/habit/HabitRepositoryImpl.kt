@@ -82,7 +82,7 @@ class HabitRepositoryImpl(
         syncManager.schedulePush()
     }
 
-    override suspend fun recordRelapse(habitId: String) {
+    override suspend fun recordOccurrence(habitId: String) {
         recordCheckIn(habitId)
     }
 

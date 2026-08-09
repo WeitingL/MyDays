@@ -173,15 +173,20 @@ fun GlassChoiceChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val pressAlpha by animateFloatAsState(if (isPressed) 0.6f else 1f, label = "glassChoiceChipPress")
+
     val background = if (selected) SettingContentColor else Color.White.copy(alpha = 0.5f)
     val contentColor = if (selected) Color.White else SettingContentColor
 
     Box(
         modifier = modifier
+            .graphicsLayer(alpha = pressAlpha)
             .clip(RoundedCornerShape(50))
             .background(background)
             .border(1.dp, Color.White.copy(alpha = 0.7f), RoundedCornerShape(50))
-            .clickable(onClick = onClick)
+            .clickable(interactionSource = interactionSource, indication = null, onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {

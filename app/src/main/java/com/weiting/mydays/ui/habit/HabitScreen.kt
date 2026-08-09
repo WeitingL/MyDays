@@ -5,16 +5,20 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,7 +35,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.weiting.mydays.data.habit.Habit
 import com.weiting.mydays.data.habit.HabitType
@@ -46,15 +52,92 @@ import com.weiting.mydays.ui.component.SettingItem
 import com.weiting.mydays.ui.component.SettingSectionHeader
 import com.weiting.mydays.ui.component.SubScreenScaffold
 import org.koin.androidx.compose.koinViewModel
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.ui.graphics.graphicsLayer
 
-private fun HabitType.label(): String = when (this) {
-    HabitType.BUILD -> "養成好習慣"
-    HabitType.QUIT -> "戒除壞習慣"
-}
+/** 習慣列：leading icon + 三行文字 + trailing 控制 */
+@Composable
+private fun HabitRow(
+    item: HabitWithStreak,
+    onEdit: () -> Unit,
+    onToggleBuild: () -> Unit,
+    onRecordQuit: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val habit = item.habit
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val pressAlpha by animateFloatAsState(if (isPressed) 0.6f else 1f, label = "habitRowPress")
 
-private fun HabitWithStreak.subtitle(): String = when (habit.type) {
-    HabitType.BUILD -> "${habit.type.label()} · 連續 $streak 天"
-    HabitType.QUIT -> "${habit.type.label()} · 已 $streak 天未破戒"
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(interactionSource = interactionSource, indication = null, onClick = onEdit)
+            .graphicsLayer(alpha = pressAlpha)
+            .heightIn(min = 56.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.LocalFireDepartment,
+            contentDescription = habit.name,
+            tint = SettingContentColor,
+            modifier = Modifier.size(22.dp)
+        )
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 14.dp)
+        ) {
+            Text(text = habit.name, color = SettingContentColor, fontSize = 16.sp)
+            Text(
+                text = habitStreakText(habit.type, item.streak),
+                color = SettingContentColor,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+            milestoneText(item.streak)?.let { milestone ->
+                Text(
+                    text = milestone,
+                    color = SettingContentColor.copy(alpha = 0.6f),
+                    fontSize = 14.sp
+                )
+            }
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            when (habit.type) {
+                HabitType.BUILD -> IconButton(onClick = onToggleBuild) {
+                    Icon(
+                        imageVector = if (item.completedToday) Icons.Default.CheckCircle
+                        else Icons.Outlined.CheckCircle,
+                        contentDescription = "今日打卡",
+                        tint = SettingContentColor
+                    )
+                }
+                HabitType.QUIT -> GlassChoiceChip(
+                    text = "今天發生了",
+                    selected = false,
+                    onClick = onRecordQuit
+                )
+            }
+            IconButton(onClick = onDelete) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "刪除",
+                    tint = SettingContentColor.copy(alpha = 0.5f)
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -80,43 +163,12 @@ fun HabitScreen(
             SettingSectionHeader("我的習慣")
             SettingGroup {
                 habits.forEachIndexed { index, item ->
-                    val habit = item.habit
-                    SettingItem(
-                        icon = if (habit.type == HabitType.BUILD) Icons.Default.TrendingUp else Icons.Default.Block,
-                        title = habit.name,
-                        subtitle = item.subtitle(),
-                        onClick = { editorTarget = HabitEditorState(habit) },
-                        trailing = {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                when (habit.type) {
-                                    HabitType.BUILD -> IconButton(
-                                        onClick = { viewModel.toggleTodayCheckIn(habit.id, item.completedToday) }
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.CheckCircle,
-                                            contentDescription = "今日打卡",
-                                            tint = if (item.completedToday) SettingContentColor
-                                            else SettingContentColor.copy(alpha = 0.25f)
-                                        )
-                                    }
-                                    HabitType.QUIT -> GlassChoiceChip(
-                                        text = "破戒",
-                                        selected = false,
-                                        onClick = { viewModel.recordRelapse(habit.id) }
-                                    )
-                                }
-                                IconButton(onClick = { viewModel.deleteHabit(habit.id) }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
-                                        contentDescription = "刪除",
-                                        tint = SettingContentColor.copy(alpha = 0.5f)
-                                    )
-                                }
-                            }
-                        }
+                    HabitRow(
+                        item = item,
+                        onEdit = { editorTarget = HabitEditorState(item.habit) },
+                        onToggleBuild = { viewModel.toggleTodayCheckIn(item.habit.id, item.completedToday) },
+                        onRecordQuit = { viewModel.recordOccurrence(item.habit.id) },
+                        onDelete = { viewModel.deleteHabit(item.habit.id) }
                     )
                     if (index != habits.lastIndex) {
                         SettingDivider()
@@ -188,7 +240,7 @@ private fun HabitEditorDialog(
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             HabitType.entries.forEach { option ->
                 GlassChoiceChip(
-                    text = option.label(),
+                    text = option.modeLabel(),
                     selected = type == option,
                     onClick = { type = option }
                 )

@@ -3,6 +3,10 @@
 > 所屬 Feature：`doc/feature/2026-07-22_habit.md`
 > 狀態：草稿
 > Jira：___
+>
+> ⚠️ **2026-08-08 用語修訂**：本文的「好習慣 / 壞習慣」已改稱「每天都做 / 克制不做」，
+> `HabitType.BUILD / QUIT` 不變，**設計與資料結構全部繼續有效**。
+> 見 `doc/feature/2026-07-22_habit.md` Phase 4。
 
 ---
 

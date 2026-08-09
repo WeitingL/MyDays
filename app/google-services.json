@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "225486325284-j8f9584lk26qatrot9hup1siv1aedps1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.weiting.mydays",
+            "certificate_hash": "b27b1dd4da15260fdcc80e3a1f56326d490a68d6"
+          }
+        },
+        {
           "client_id": "225486325284-ra5c0r17ghgbb7r3notbqmnaaknm45se.apps.googleusercontent.com",
           "client_type": 3
         }

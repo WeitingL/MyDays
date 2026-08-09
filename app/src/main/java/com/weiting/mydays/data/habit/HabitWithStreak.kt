@@ -22,9 +22,9 @@ fun buildStreak(completedDays: Set<Long>, today: Long): Int {
     return streak
 }
 
-/** QUIT: clean days since the last relapse, or since the habit was created if none. */
-fun quitStreak(relapseDays: List<Long>, createdDay: Long, today: Long): Int {
-    val anchor = relapseDays.maxOrNull() ?: createdDay
+/** QUIT: clean days since the last occurrence, or since the habit was created if none. */
+fun quitStreak(occurrenceDays: List<Long>, createdDay: Long, today: Long): Int {
+    val anchor = occurrenceDays.maxOrNull() ?: createdDay
     return (today - anchor).toInt().coerceAtLeast(0)
 }
 

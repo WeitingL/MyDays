@@ -9,5 +9,5 @@ interface HabitRepository {
     suspend fun delete(id: String)
     suspend fun checkInToday(habitId: String)
     suspend fun undoTodayCheckIn(habitId: String)
-    suspend fun recordRelapse(habitId: String)
+    suspend fun recordOccurrence(habitId: String)
 }

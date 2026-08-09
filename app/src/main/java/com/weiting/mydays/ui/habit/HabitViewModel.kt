@@ -37,7 +37,7 @@ class HabitViewModel(
         }
     }
 
-    fun recordRelapse(habitId: String) {
-        viewModelScope.launch { repository.recordRelapse(habitId) }
+    fun recordOccurrence(habitId: String) {
+        viewModelScope.launch { repository.recordOccurrence(habitId) }
     }
 }

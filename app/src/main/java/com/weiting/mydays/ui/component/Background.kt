@@ -39,8 +39,7 @@ import androidx.compose.ui.unit.sp
 enum class NavBarBackground(val label: String, val colors: List<Color>) {
     Sunrise(label = "Sunrise", colors = listOf(Color(0xFFFFE5EC), Color(0xFFFFD6E8), Color(0xFFFFF0C2))),
     Sky(label = "Sky", colors = listOf(Color(0xFFE0F7FA), Color(0xFFB3E5FC), Color(0xFF81D4FA))),
-    Mint(label = "Mint", colors = listOf(Color(0xFFE8F9F0), Color(0xFFC8F4DE), Color(0xFFA0E9C8))),
-    Lavender(label = "Lavender", colors = listOf(Color(0xFFF1E9FF), Color(0xFFDCC9FF), Color(0xFFC2A8FF)));
+    Mint(label = "Mint", colors = listOf(Color(0xFFE8F9F0), Color(0xFFC8F4DE), Color(0xFFA0E9C8)));
 
     val brush: Brush get() = Brush.linearGradient(colors)
 }

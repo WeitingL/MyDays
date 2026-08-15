@@ -22,10 +22,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -139,9 +138,8 @@ private fun GlassNavItem(
 
 internal val previewNavItems = listOf(
     NavBarItem(Icons.Default.Home, "Home"),
-    NavBarItem(Icons.Default.Search, "Search"),
-    NavBarItem(Icons.Default.Favorite, "Favorite"),
-    NavBarItem(Icons.Default.Person, "Profile")
+    NavBarItem(Icons.Default.DateRange, "Flow"),
+    NavBarItem(Icons.Default.Settings, "Setting")
 )
 
 @Preview(name = "Sliding pill", showBackground = true, widthDp = 360, heightDp = 640)

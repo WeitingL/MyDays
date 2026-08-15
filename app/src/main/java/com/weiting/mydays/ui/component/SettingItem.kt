@@ -225,7 +225,7 @@ private fun SettingItemGalleryPreview() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(NavBarBackground.Lavender.brush)
+            .background(NavBarBackground.Mint.brush)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp)
             .padding(top = 32.dp, bottom = 32.dp)

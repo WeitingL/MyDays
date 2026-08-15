@@ -4,8 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -18,26 +17,20 @@ import com.weiting.mydays.ui.component.MainScaffold
 import com.weiting.mydays.ui.component.NavBarBackground
 import com.weiting.mydays.ui.component.NavBarItem
 import com.weiting.mydays.ui.features.FeaturesNavHost
-import com.weiting.mydays.ui.features.ROUTE_FEATURES_HABIT
+import com.weiting.mydays.ui.flow.FlowScreen
 import com.weiting.mydays.ui.home.HomeScreen
-import com.weiting.mydays.ui.profile.ProfileScreen
-import com.weiting.mydays.ui.records.RecordsScreen
 
 private val tabItems = listOf(
     NavBarItem(Icons.Default.Home, "首頁"),
-    NavBarItem(Icons.Default.DateRange, "紀錄"),
-    NavBarItem(Icons.Default.Menu, "功能"),
-    NavBarItem(Icons.Default.Person, "我的")
+    NavBarItem(Icons.Default.DateRange, "河流"),
+    NavBarItem(Icons.Default.Settings, "設定")
 )
 
 private val tabBackgrounds = listOf(
     NavBarBackground.Sunrise,
     NavBarBackground.Sky,
-    NavBarBackground.Mint,
-    NavBarBackground.Lavender
+    NavBarBackground.Mint
 )
-
-private const val FEATURES_TAB_INDEX = 2
 
 @Composable
 fun MainScreen(
@@ -45,23 +38,29 @@ fun MainScreen(
     modifier: Modifier = Modifier
 ) {
     var selectedIndex by remember { mutableIntStateOf(0) }
-    val featuresNavController = rememberNavController()
-    val featuresBackStackEntry by featuresNavController.currentBackStackEntryAsState()
-    val isFeaturesSubPage = featuresBackStackEntry?.destination?.route == ROUTE_FEATURES_HABIT
+    val settingNavController = rememberNavController()
+    val currentBackStackEntry by settingNavController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
+
+    // Only show NavBar on main pages (Home / Flow / Setting root)
+    val showNavBar = selectedIndex != 2 || currentRoute == "setting"
 
     MainScaffold(
         items = tabItems,
         backgrounds = tabBackgrounds,
         selectedIndex = selectedIndex,
         onItemSelected = { selectedIndex = it },
-        showNavBar = !isFeaturesSubPage,
+        showNavBar = showNavBar,
         modifier = modifier.fillMaxSize()
     ) { index ->
         when (index) {
             0 -> HomeScreen()
-            1 -> RecordsScreen()
-            FEATURES_TAB_INDEX -> FeaturesNavHost(navController = featuresNavController)
-            else -> ProfileScreen(onLogout = onLogout)
+            1 -> FlowScreen()
+            2 -> FeaturesNavHost(
+                navController = settingNavController,
+                onLogout = onLogout
+            )
+            else -> HomeScreen()
         }
     }
 }

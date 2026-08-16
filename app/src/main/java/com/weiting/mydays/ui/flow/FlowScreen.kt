@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.weiting.mydays.ui.component.BaseScreen
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -302,11 +304,15 @@ private fun DateDivider(date: String, modifier: Modifier = Modifier) {
  * FlowScreen 主畫面
  */
 @Composable
-fun FlowScreen(modifier: Modifier = Modifier) {
+fun FlowScreen(
+    modifier: Modifier = Modifier,
+    habitViewModel: com.weiting.mydays.ui.habit.HabitViewModel = org.koin.androidx.compose.koinViewModel()
+) {
     var selectedFilter by remember { mutableIntStateOf(0) }
     val filterOption = FilterOption.entries[selectedFilter]
+    val habitRecords by habitViewModel.flowRecords.collectAsState()
 
-    // Mock data
+    // Mock data (未來會移除，改用真實資料)
     val allRecords = listOf(
         DateGroup(
             dateLabel = "今天",
@@ -391,43 +397,39 @@ fun FlowScreen(modifier: Modifier = Modifier) {
         }.filter { it.records.isNotEmpty() }
     }
 
-    LazyColumn(
+    BaseScreen(
+        title = "河流",
         modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        // 頂部間距
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        // 1. 日期進度方塊
-        item {
-            ActivityGrid()
-        }
-
-        // 2. Filter Tabs
-        item {
-            FilterTabs(
-                selectedFilter = filterOption,
-                onFilterSelected = { selectedFilter = it.ordinal }
-            )
-        }
-
-        // 3. 時間軸列表
-        filteredGroups.forEach { group ->
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // 1. 日期進度方塊
             item {
-                DateDivider(date = group.dateLabel)
+                ActivityGrid()
             }
-            items(group.records) { record ->
-                TimelineRecordCard(record = record)
-            }
-        }
 
-        // 底部間距
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
+            // 2. Filter Tabs
+            item {
+                FilterTabs(
+                    selectedFilter = filterOption,
+                    onFilterSelected = { selectedFilter = it.ordinal }
+                )
+            }
+
+            // 3. 時間軸列表
+            filteredGroups.forEach { group ->
+                item {
+                    DateDivider(date = group.dateLabel)
+                }
+                items(group.records) { record ->
+                    TimelineRecordCard(record = record)
+                }
+            }
         }
     }
 }

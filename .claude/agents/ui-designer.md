@@ -32,7 +32,68 @@ repository、data 層——連一行都不動。
 3. `.claude/CONVENTIONS.md` - 設計通則
 4. `ui/component/` 下的既有元件 —— **必須實際讀過**再決定是沿用、擴充還是新造
 
-## 放置規則
+## Preview vs 正式實作
+
+### Preview 工作模式（優先）
+
+**工作位置**：`app/src/debug/java/com/weiting/mydays/preview/`
+
+當任務是「設計 XXX 頁面」或「展示 UI spec」時，在 preview 目錄工作：
+
+```
+preview/
+├── navigation/          # Preview navigation system
+├── samples/            # 完整的 UI spec（可互動）
+├── wireframes/         # 靜態 wireframe（不可互動）
+└── experiments/        # 實驗性設計
+```
+
+**核心原則**：
+1. **不動正式檔案**：不修改 `app/src/main/java/` 的任何檔案（HomeScreen.kt、FlowScreen.kt...）
+2. **用 interface 定義互動**：所有 actions/events/state 都要定義 interface
+3. **建立 preview navigation**：展示點擊效果和頁面流程
+
+**Interface 定義範例**：
+```kotlin
+// Contract.kt
+data class ScreenState(
+    val items: List<Item>,
+    val selectedFilter: FilterType
+)
+
+interface ScreenActions {
+    fun onItemClicked(id: String)
+    fun onFilterSelected(filter: FilterType)
+}
+
+// Preview.kt
+@Composable
+fun ScreenPreview(
+    state: ScreenState,
+    actions: ScreenActions
+) {
+    // UI implementation
+    Button(onClick = { actions.onItemClicked(item.id) })
+}
+```
+
+**Preview Navigation System**：
+
+在 `preview/navigation/PreviewNavigation.kt` 建立簡單的導航：
+- 展示頁面切換效果
+- 支援返回上一頁
+- 示範點擊 list item 進入詳細頁等流程
+
+**目的**：
+- Preview 是給船長 review UI spec 用的
+- 確認 OK 後，再由 Engineer 轉換到正式 app
+- Interface 定義讓轉換更容易
+
+### 正式元件工作模式
+
+**工作位置**：`app/src/main/java/com/weiting/mydays/ui/`
+
+當任務是「實作 XXX 元件」時，才修改正式檔案：
 
 | 情況 | 放哪 |
 |---|---|

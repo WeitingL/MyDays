@@ -55,9 +55,11 @@ There's no fixed PM→Engineer→QA pipeline; the Orchestrator looks at the stat
 
 To make this machine-checkable rather than vibes-based, every sub-agent reply follows a fixed JSON schema (`agent`, `status`, `summary`, `next_suggested`, plus role-specific fields like `findings` or `decision_needed` for PMM) — so the Orchestrator can decide its next dispatch by parsing a field, not by re-reading prose. Every task also leaves a paper trail under `.claude/outputs/<task>/`: `spec.md`, `ac.md`, `implementation.md`, `test-report.md`, and an `orchestrator-log.md` with a timeline of what it decided and why. `CONVENTIONS.md` accumulates decisions we don't want to re-litigate, each with a dated "why."
 
-### Working across two folders at once
+### Working across two folders — and two CLI sessions — at once
 
-The repo is checked out twice on disk — `myday-work1` (the active workspace) and `myday-work2` (reserved) — both pointed at this same GitHub repo. A single file, `.claude/context/current-repo.txt`, tracks which checkout the Orchestrator is currently operating on. Telling it "switch to myday-work2" just repoints that file and all following dispatches target the other checkout instead. The idea is to let me keep a task running against one feature in `myday-work1` while stepping into `myday-work2` to scope or start a second, unrelated feature, without their file edits colliding in a single working tree. It's a genuine current limitation, not a solved problem — see [Current limits](#current-limits) below.
+The repo is checked out twice on disk — `myday-work1` and `myday-work2` — both pointed at this same GitHub repo. In practice, that means running two separate CLI sessions side by side, one rooted at each checkout: a task can be running in `myday-work1` while I scope or start a second, unrelated task in `myday-work2`, without either session's file edits colliding in a shared working tree. (There's also a lighter single-session mechanism for this — a `current-repo.txt` file one Orchestrator instance can be told to repoint at the other checkout — but two independent CLI sessions running in parallel is the setup I've actually been testing.)
+
+Within a single task, the Orchestrator can also fan out to more than one sub-agent at once rather than strictly one-at-a-time — the open question isn't *whether* to parallelize, it's figuring out a good dispatch strategy: what's actually safe/useful to run in parallel vs. what needs to stay sequential, and how agents hand off or merge work without stepping on each other.
 
 ### Agent → model mapping
 
@@ -65,23 +67,23 @@ The Orchestrator, PMM, Engineer, and QA are dispatched on demand as subagents, w
 
 ### Specific questions I'm trying to answer with this project
 
-1. **Cross-project workflow switching** — can I give an agent a task in one project/folder and productively switch to a different project while it works, then come back?
+1. **Cross-project parallel work** — running two CLI sessions across `myday-work1`/`myday-work2`, can I productively keep two unrelated tasks moving at once without them interfering with each other?
 2. **Orchestrator vs. fixed pipeline** — is it better for a main agent to *decide* which sub-agent to call next and why, versus a hard-coded PM→Engineer→QA sequence?
-3. **A dedicated UI/UX sub-agent** — does separating "what it should look like" (previewable, no wiring) from "how it's implemented" produce a better development flow for product-shaped work?
-4. **Spec-driven flow** — which parts of a spec-first process (written AC, structured handoff docs between agents) actually pay off versus add ceremony?
-5. **Model selection per role** — does pinning a specific sub-agent (like UI Designer) to a stronger model actually pay off, versus routing every dispatch through one default model?
+3. **Best dispatch strategy for multiple sub-agents** — when is parallel dispatch actually safe/useful versus needing to stay sequential, and how should agents hand off work cleanly?
+4. **A dedicated UI/UX sub-agent** — does separating "what it should look like" (previewable, no wiring) from "how it's implemented" produce a better development flow for product-shaped work — and how do I get it to reason about realistic user flows, not just "technically works"?
+5. **Spec-driven flow** — which parts of a spec-first process (written AC, structured handoff docs between agents) actually pay off versus add ceremony?
+6. **Model selection per role** — does pinning a specific sub-agent (like UI Designer) to a stronger model actually pay off, versus routing every dispatch through one default model?
 
 ## Status
 
 Early. The app currently has: Google sign-in, habit CRUD, daily check-in with streaks, offline-first Room↔Firestore sync, per-habit reminder notifications, and a home screen widget. Navigation and some screens are still being reshaped as the underlying agent workflow itself evolves — this is a live research project, not a finished product, and I'm not trying to present it as one.
 
-### Current limits
+### Open problems
 
-- **Sequential execution** — agents run one at a time; no parallel dispatch yet.
-- **Single repo at a time** — the two-folder setup above lets me *switch* context quickly, but the Orchestrator itself still works on one checkout per task, not both simultaneously.
-- **Manual folder switching** — moving between `myday-work1` and `myday-work2` means telling the Orchestrator explicitly (or editing `current-repo.txt`), not something it decides on its own.
-
-These are exactly the open questions I'm iterating on next.
+- **Finding a good dispatch strategy** — parallel dispatch across sub-agents (and across the two CLI sessions above) is possible; I haven't yet nailed down *how* to dispatch well — what to run in parallel, what to keep sequential, how to hand off cleanly.
+- **Weak user-flow reasoning** — agents reliably produce something that *runs*, but the resulting user flow is sometimes one no real user would actually follow. Getting an agent to reason about "what would a user naturally do here" is still unsolved.
+- **QA's UI-testing approach needs more scaffolding** — the QA agent's current concept of "testing the UI" needs clearer guidance and tooling; right now it's underspecified.
+- **Token cost is high** — this workflow burns noticeably more tokens than a simpler single-agent loop. I think the output quality is better than that simpler loop, but I'm still weighing whether the tradeoff holds up at scale.
 
 ## Running it
 
